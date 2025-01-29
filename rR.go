@@ -12,6 +12,26 @@ import (
 var revolver int = 0
 var c string
 
+func createOp(){
+	filePath := "computer.txt"
+	content := "Hello, I am Alex, I'm your opponent. Why are we playing this game? Well... nevermind. Let's have some fun ;)"
+
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println("Opponent already exists, skipping delivering.")
+		time.Sleep(2 * time.Second)
+	} else {
+		defer file.Close()
+		_, err = file.WriteString(content)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+		fmt.Println("Your opponent has been delivered.")
+		time.Sleep(2 * time.Second)
+	}
+}
+
 func chance(revolver int, c *string){	
 	switch revolver {
 	case 1:
@@ -31,7 +51,7 @@ func chance(revolver int, c *string){
 
 func respond(){
 	
-	random := rand.Intn(4)+1
+	random := rand.Intn(3)+1
 	
 	switch random{
 	case 1:
@@ -40,19 +60,16 @@ func respond(){
 		fmt.Println("Hehe...")
 	case 3:
 		fmt.Println("That was pretty close")
-	case 4:
-		fmt.Println("Every time feels as first...")
 	}
-	
 
 }
 
 func start(){
 	fmt.Println("Hi.")
 	time.Sleep(2 * time.Second)
-	fmt.Println("We gonna play russian roulette.")
+	fmt.Println("You are gonna play russian roulette.")
 	time.Sleep(2 * time.Second)
-	fmt.Println("I loaded the revolver with 1 bullet, we will shoot in turns. Until the first death.")
+	fmt.Println("I loaded the revolver with 1 bullet, you both will shoot in turns. Until the first death.")
 	time.Sleep(3 * time.Second)
 	fmt.Println("Start?(Y/N)")
 }
@@ -60,6 +77,7 @@ func start(){
 
 func main() {
 	
+	createOp()
 	rand.Seed(time.Now().UnixNano())
 	xBullet := rand.Intn(6) +1
 	turn := rand.Intn(2) +1
@@ -88,7 +106,16 @@ func main() {
 					}
 					time.Sleep(2 * time.Second)
 					if revolver == xBullet{
-						fmt.Println("Bang! Im dead")
+						fmt.Println("Bang!")
+						
+						pcLife := "computer.txt"
+						err :=  os.Remove(pcLife)
+						if err != nil {
+							fmt.Println("Error to killing Alex", err)
+						} else {
+							fmt.Println("Alex died. Thank you for game! See you later...")
+						}
+
 						return
 					}else{
 						respond()
@@ -130,7 +157,7 @@ func main() {
 						input, _ := reader.ReadString('\n') 
 						input = strings.TrimSpace(input)
 
-						if input == "I am loser" {
+						if input == "I am loser" || input == "i am loser"{
 							fmt.Println("Goodbye.")
 							return
 						} else {
